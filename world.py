@@ -24,9 +24,9 @@ def vector(type, *args):
 
 class model:
     def __init__(self, vertices, colorMatrix, indice):
-        self.vertices = vertices
-        self.colorMatrix = colorMatrix
-        self.indice = indice
+        self.vertices = vector(GLfloat, *vertices)
+        self.colorMatrix = vector(GLfloat, *colorMatrix)
+        self.indice = vector(GLuint, *indice)
         self.angle = 0
 
     def update(self):
@@ -43,10 +43,10 @@ class model:
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_COLOR_ARRAY)
 
-        glColorPointer(3, GL_FLOAT, 0, vector(GLfloat, *self.colorMatrix))
-        glVertexPointer(3, GL_FLOAT, 0, vector(GLfloat, *self.vertices))
+        glColorPointer(3, GL_FLOAT, 0, self.colorMatrix)
+        glVertexPointer(3, GL_FLOAT, 0, self.vertices)
 
-        glDrawElements(GL_QUADS, len(self.indice), GL_UNSIGNED_INT, vector(GLuint, *self.indice))
+        glDrawElements(GL_QUADS, len(self.indice), GL_UNSIGNED_INT, self.indice)
 
 
         glDisableClientState(GL_COLOR_ARRAY)
@@ -111,8 +111,8 @@ indice = (
     0, 4, 5, 1, # top face
     4, 0, 3, 7, # right face
     1, 5, 6, 2, # left face
-    3, 2, 6, 7 # bottom face
-    #4, 7, 6, 5  #back face
+    3, 2, 6, 7, # bottom face
+    4, 7, 6, 5  #back face
 )
 
 obj = model(cube, color, indice)
