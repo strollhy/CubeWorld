@@ -11,6 +11,7 @@ from pyglet import clock, window
 
 '''
 
+###
 def vector(type, *args):
     '''
         return a ctype array
@@ -20,40 +21,62 @@ def vector(type, *args):
     '''
     return (type*len(args))(*args)
 
+###
+def setup():
+    # look for GL_DEPTH_BUFFER_BIT
+    glEnable(GL_DEPTH_TEST)
 
 
+def cube_vertices(x, y, z, n):
+    """ Return the vertices of the cube at position x, y, z with size 2*n.
+
+    """
+    return [
+        x-n,y+n,z-n, x-n,y+n,z+n, x+n,y+n,z+n, x+n,y+n,z-n,  # top
+        x-n,y-n,z-n, x+n,y-n,z-n, x+n,y-n,z+n, x-n,y-n,z+n,  # bottom
+        x-n,y-n,z-n, x-n,y-n,z+n, x-n,y+n,z+n, x-n,y+n,z-n,  # left
+        x+n,y-n,z+n, x+n,y-n,z-n, x+n,y+n,z-n, x+n,y+n,z+n,  # right
+        x-n,y-n,z+n, x+n,y-n,z+n, x+n,y+n,z+n, x-n,y+n,z+n,  # front
+        x+n,y-n,z-n, x-n,y-n,z-n, x-n,y+n,z-n, x+n,y+n,z-n,  # back
+    ]
+
+
+
+#############
+''' Model '''
+#############
 class model:
     def __init__(self, vertices, colorMatrix, indice):
         self.vertices = vector(GLfloat, *vertices)
         self.colorMatrix = vector(GLfloat, *colorMatrix)
         self.indice = vector(GLuint, *indice)
         self.angle = 0
+        self.batch = pyglet.graphics.Batch()
 
     def update(self):
-        self.angle += 1
+        self.angle += 3
         self.angle %= 360
 
     def draw(self):
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
 
-        glRotatef(self.angle, 1, 1, 0)
-
+        glRotatef(self.angle, 1, 1, 1)
 
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_COLOR_ARRAY)
 
         glColorPointer(3, GL_FLOAT, 0, self.colorMatrix)
         glVertexPointer(3, GL_FLOAT, 0, self.vertices)
-
         glDrawElements(GL_QUADS, len(self.indice), GL_UNSIGNED_INT, self.indice)
-
-
+        
         glDisableClientState(GL_COLOR_ARRAY)
         glDisableClientState(GL_VERTEX_ARRAY)
 
 
-
+#############
+''' World '''
+#############
 class world:
     def __init__(self):
         self.element = []
@@ -70,19 +93,13 @@ class world:
             obj.draw()
 
 
-def setup():
-    # look for GL_DEPTH_BUFFER_BIT
-    glEnable(GL_DEPTH_TEST)
-
-
-
-
-
-
-
+########################################################################
 win = window.Window(fullscreen=False, vsync=True, resizable=True, height=600, width=600)
 mWorld = world()
 
+''' 
+coordinates of vertices 
+'''
 cube = (
     1, 1, 1, #0
     -1, 1, 1, #1
@@ -94,10 +111,12 @@ cube = (
     1, -1, -1 #7
 )
 
-
+''' 
+colors of vertices 
+'''
 color = (
-    1, 0, 0,
-    1, 0, 0,
+    1, 1, 0,
+    1, 1, 0,
     1, 0, 0,
     1, 0, 0,
     0, 1, 0,
@@ -106,13 +125,16 @@ color = (
     0, 0, 1
 )
 
+''' 
+Define the vertex indices for the cube 
+'''
 indice = (
     0, 1, 2, 3, # front face
     0, 4, 5, 1, # top face
     4, 0, 3, 7, # right face
     1, 5, 6, 2, # left face
     3, 2, 6, 7, # bottom face
-    4, 7, 6, 5  #back face
+    4, 5, 6, 7, # back face
 )
 
 obj = model(cube, color, indice)
@@ -130,7 +152,9 @@ def on_resize(width, height):
 
 @win.event
 def on_draw():
-    glClearColor(0.2, 0.2, 0.2, 0.8)
+    # set background color
+    glClearColor(0.6, 0.6, 0.6, 0.8)
+    
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     mWorld.draw()
 
