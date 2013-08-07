@@ -146,7 +146,7 @@ def on_resize(width, height):
     glViewport(0, 0, width, height)
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
-    glOrtho(-10, 10, -10, 10, -10, 10)
+    #glOrtho(-10, 10, -10, 10, -10, 10)
     glMatrixMode(GL_MODELVIEW)
     return pyglet.event.EVENT_HANDLED
 
